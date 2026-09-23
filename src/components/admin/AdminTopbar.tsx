@@ -1,5 +1,5 @@
 import { Globe } from "lucide-react";
-import { LANGUAGES, languageLabel, languageNativeLabel } from "@/config/platform";
+import { LANGUAGES, languageLabel } from "@/config/platform";
 import { useAdminStore } from "@/store/adminStore";
 import {
   Select,
@@ -23,18 +23,16 @@ export function AdminTopbar({ title, subtitle }: { title: string; subtitle?: str
       <div className="flex items-center gap-2 shrink-0">
         <Globe className="size-4 text-primary" />
         <Select value={language} onValueChange={(v) => setLanguage(v as typeof language)}>
-          <SelectTrigger className="w-44">
+          <SelectTrigger className="w-40">
             <SelectValue placeholder="Language">
-              {language === "all"
-                ? "All languages"
-                : `${languageNativeLabel(language)} · ${languageLabel(language)}`}
+              {language === "all" ? "All languages" : languageLabel(language)}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All languages</SelectItem>
             {LANGUAGES.map((l) => (
               <SelectItem key={l.code} value={l.code} disabled={!l.enabled}>
-                {l.nativeLabel} · {l.label}
+                {l.label}
                 {!l.enabled ? " (soon)" : ""}
               </SelectItem>
             ))}

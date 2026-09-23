@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CONTENT_VERTICALS, languageNativeLabel, verticalLabel } from "@/config/platform";
+import { CONTENT_VERTICALS, languageLabel, verticalLabel } from "@/config/platform";
 import { useVideos } from "@/hooks/admin/useVideos";
 import { compactNumber, duration, shortDate } from "@/lib/format";
 import type { VideoStatus } from "@/types/admin";
@@ -158,7 +158,7 @@ function VideosPage() {
                   <TableCell>
                     <p className="font-medium">{v.title}</p>
                     <p className="text-xs text-muted-foreground">
-                      {languageNativeLabel(v.language)} · {v.kind}
+                      {languageLabel(v.language)} · {v.kind}
                       {v.episodes ? ` · ${v.episodes} eps` : ""}
                       {v.mature ? " · 18+" : ""}
                     </p>

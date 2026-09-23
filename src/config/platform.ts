@@ -15,10 +15,10 @@ export interface LanguageConfig {
 }
 
 export const LANGUAGES: LanguageConfig[] = [
-  { code: "bho", label: "Bhojpuri", nativeLabel: "भोजपुरी", enabled: true },
-  { code: "hi", label: "Hindi", nativeLabel: "हिन्दी", enabled: false },
-  { code: "bh-mag", label: "Magahi", nativeLabel: "मगही", enabled: false },
-  { code: "raj", label: "Rajasthani", nativeLabel: "राजस्थानी", enabled: false },
+  { code: "bho", label: "Bhojpuri", nativeLabel: "Bhojpuri", enabled: true },
+  { code: "hi", label: "Hindi", nativeLabel: "Hindi", enabled: false },
+  { code: "bh-mag", label: "Magahi", nativeLabel: "Magahi", enabled: false },
+  { code: "raj", label: "Rajasthani", nativeLabel: "Rajasthani", enabled: false },
 ];
 
 export const DEFAULT_LANGUAGE: LanguageCode = "bho";
@@ -29,7 +29,7 @@ export const languageLabel = (code: LanguageCode) =>
   LANGUAGES.find((l) => l.code === code)?.label ?? code;
 
 export const languageNativeLabel = (code: LanguageCode) =>
-  LANGUAGES.find((l) => l.code === code)?.nativeLabel ?? code;
+  LANGUAGES.find((l) => l.code === code)?.label ?? code;
 
 /** Content verticals — configuration, not component logic. */
 export interface ContentVertical {

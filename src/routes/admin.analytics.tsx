@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Eye, Flame, Loader2, Star, Timer } from "lucide-react";
+import { Eye, Film, Flame, Loader2, Star } from "lucide-react";
 import { AdminTopbar } from "@/components/admin/AdminTopbar";
 import { StatCard } from "@/components/admin/StatCard";
 import { useDashboardStats } from "@/hooks/admin/useCatalog";
@@ -47,15 +47,15 @@ function AnalyticsPage() {
           <>
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <StatCard
-                label="Watch hours"
-                value={compactNumber(stats.watchHours)}
-                icon={Timer}
+                label="Total views"
+                value={compactNumber(stats.totalViews ?? stats.viewsTrend.reduce((s, d) => s + d.views, 0))}
+                icon={Eye}
                 accent
               />
               <StatCard
-                label="Weekly views"
-                value={compactNumber(stats.viewsTrend.reduce((s, d) => s + d.views, 0))}
-                icon={Eye}
+                label="Published videos"
+                value={fullNumber(stats.publishedVideos)}
+                icon={Film}
               />
               <StatCard label="Top vertical" value={stats.verticalMix[0]?.vertical ?? "—"} icon={Flame} />
               <StatCard

@@ -21,7 +21,6 @@ import {
   CONTENT_VERTICALS,
   LANGUAGES,
   languageLabel,
-  languageNativeLabel,
   verticalLabel,
 } from "@/config/platform";
 import { useCreators } from "@/hooks/admin/useCatalog";
@@ -29,15 +28,15 @@ import { useCreateVideo } from "@/hooks/admin/useVideos";
 import type { VideoPayload } from "@/types/admin";
 
 const schema = z.object({
-  title: z.string().min(3, "Give the video a title of at least 3 characters"),
-  description: z.string().min(10, "Add a short synopsis (10+ characters)"),
-  vertical: z.string().min(1, "Pick a content vertical"),
-  language: z.enum(["bho", "hi", "bh-mag", "raj"]),
-  kind: z.enum(["short", "episode", "movie", "trailer"]),
-  status: z.enum(["draft", "processing", "published", "scheduled", "rejected"]),
-  creatorId: z.string().min(1, "Pick a creator"),
-  durationSec: z.coerce.number().min(10, "At least 10 seconds").max(7200),
-  mature: z.boolean(),
+  title: z.string().min(2, "Give the video a title of at least 2 characters"),
+  description: z.string().optional().default(""),
+  vertical: z.string().default("shorts"),
+  language: z.enum(["bho", "hi", "bh-mag", "raj"]).default("bho"),
+  kind: z.enum(["short", "episode", "movie", "trailer"]).default("short"),
+  status: z.enum(["draft", "processing", "published", "scheduled", "rejected"]).default("published"),
+  creatorId: z.string().optional().default("admin"),
+  durationSec: z.coerce.number().min(1).max(7200).default(60),
+  mature: z.boolean().default(false),
   hlsUrl: z.string().url("Enter a valid HLS (.m3u8) URL").or(z.literal("")),
   thumbnailUrl: z.string().url("Enter a valid image URL").or(z.literal("")),
 });
@@ -76,9 +75,9 @@ function UploadPage() {
       vertical: "shorts",
       language: "bho",
       kind: "short",
-      status: "draft",
-      creatorId: "",
-      durationSec: 120,
+      status: "published",
+      creatorId: "admin",
+      durationSec: 60,
       mature: false,
       hlsUrl: "",
       thumbnailUrl: "",
@@ -90,13 +89,17 @@ function UploadPage() {
     handleSubmit,
     watch,
     setValue,
+    clearErrors,
     formState: { errors },
   } = form;
 
   const onSubmit = (values: FormValues) => {
-    const parsed = schema.parse(values);
-    create.mutate(parsed as VideoPayload, {
-      onSuccess: () => toast.success(`"${parsed.title}" saved to the catalog`),
+    const payload = {
+      ...values,
+      creatorId: values.creatorId || "admin",
+    };
+    create.mutate(payload as VideoPayload, {
+      onSuccess: () => toast.success(`"${values.title}" saved to the catalog`),
     });
   };
 
@@ -160,13 +163,13 @@ function UploadPage() {
               >
                 <SelectTrigger>
                   <SelectValue>
-                    {languageNativeLabel(watch("language"))} · {languageLabel(watch("language"))}
+                    {languageLabel(watch("language"))}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {LANGUAGES.map((l) => (
                     <SelectItem key={l.code} value={l.code} disabled={!l.enabled}>
-                      {l.nativeLabel} · {l.label}
+                      {l.label}
                       {!l.enabled ? " (soon)" : ""}
                     </SelectItem>
                   ))}
@@ -197,25 +200,28 @@ function UploadPage() {
             <div className="space-y-2">
               <Label>Creator</Label>
               <Select
-                value={watch("creatorId")}
-                onValueChange={(v) => setValue("creatorId", v, { shouldValidate: true })}
+                value={watch("creatorId") || "admin"}
+                onValueChange={(v) => {
+                  setValue("creatorId", v || "admin", { shouldValidate: true, shouldDirty: true });
+                  clearErrors("creatorId");
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select creator">
-                    {creators.find((c) => c.id === watch("creatorId"))?.name}
+                    {creators.find((c) => c.id === watch("creatorId"))?.name ?? "Admin (Echo Reels)"}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {creators.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="admin">Admin (Echo Reels)</SelectItem>
+                  {creators
+                    .filter((c) => c.id !== "admin")
+                    .map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
-              {field("creatorId") && (
-                <p className="text-xs text-destructive">{field("creatorId")}</p>
-              )}
             </div>
 
             <div className="space-y-2">
@@ -264,13 +270,38 @@ function UploadPage() {
         <div className="panel space-y-5 p-5">
           <div className="flex items-center gap-2">
             <UploadCloud className="size-4 text-primary" />
-            <h2 className="text-base font-semibold">Streaming source</h2>
+            <h2 className="text-base font-semibold">Bunny Stream Video Source</h2>
           </div>
+
+          <div className="space-y-2 rounded-xl border border-primary/20 bg-primary/5 p-4">
+            <Label htmlFor="bunnyGuid" className="text-xs font-semibold text-primary">
+              ⚡ Quick Fill: Bunny Video ID (GUID)
+            </Label>
+            <Input
+              id="bunnyGuid"
+              placeholder="e.g. fd7ac0ae-ebe2-4037-9832-d14e46740fed or player URL"
+              onChange={(e) => {
+                const val = e.target.value.trim();
+                const match = val.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
+                if (match) {
+                  const guid = match[0];
+                  setValue("hlsUrl", `https://vz-178c7a7d-b5e.b-cdn.net/${guid}/playlist.m3u8`, { shouldValidate: true, shouldDirty: true });
+                  setValue("thumbnailUrl", `https://vz-178c7a7d-b5e.b-cdn.net/${guid}/thumbnail.jpg`, { shouldValidate: true, shouldDirty: true });
+                  clearErrors("hlsUrl");
+                  clearErrors("thumbnailUrl");
+                }
+              }}
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Paste your Bunny Stream Video GUID to automatically generate the HLS manifest and poster URLs.
+            </p>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="hlsUrl">HLS manifest URL (.m3u8)</Label>
             <Input
               id="hlsUrl"
-              placeholder="https://cdn.echoreels.in/vod/litti-chokha/master.m3u8"
+              placeholder="https://vz-178c7a7d-b5e.b-cdn.net/VIDEO_ID/playlist.m3u8"
               {...register("hlsUrl")}
             />
             {field("hlsUrl") && <p className="text-xs text-destructive">{field("hlsUrl")}</p>}
@@ -279,7 +310,7 @@ function UploadPage() {
             <Label htmlFor="thumbnailUrl">Poster image URL</Label>
             <Input
               id="thumbnailUrl"
-              placeholder="https://cdn.echoreels.in/posters/litti-chokha.jpg"
+              placeholder="https://vz-178c7a7d-b5e.b-cdn.net/VIDEO_ID/thumbnail.jpg"
               {...register("thumbnailUrl")}
             />
             {field("thumbnailUrl") && (

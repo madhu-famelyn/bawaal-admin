@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { languageNativeLabel } from "@/config/platform";
+import { languageLabel } from "@/config/platform";
 import { useCreators } from "@/hooks/admin/useCatalog";
 import { compactNumber, shortDate } from "@/lib/format";
 
@@ -72,7 +72,7 @@ function CreatorsPage() {
                     <p className="text-xs text-muted-foreground">@{c.handle}</p>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
-                    {languageNativeLabel(c.language)}
+                    {languageLabel(c.language)}
                   </TableCell>
                   <TableCell className="text-sm">{compactNumber(c.followers)}</TableCell>
                   <TableCell className="hidden md:table-cell text-sm text-muted-foreground">

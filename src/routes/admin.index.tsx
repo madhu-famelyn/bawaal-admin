@@ -69,10 +69,10 @@ function DashboardPage() {
           <>
             <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
               <StatCard
-                label="Watch hours"
-                value={compactNumber(stats.watchHours)}
-                hint="Last 7 days across all verticals"
-                icon={Timer}
+                label="Total views"
+                value={compactNumber(stats.totalViews ?? stats.viewsTrend.reduce((s, d) => s + d.views, 0))}
+                hint="Plays across all published videos"
+                icon={Eye}
                 accent
               />
               <StatCard

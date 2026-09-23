@@ -12,6 +12,7 @@ export function useDashboardStats() {
   const { data, isPending } = useQuery({
     queryKey: ["admin", "stats"],
     queryFn: () => statsService.dashboard(),
+    refetchInterval: 3000,
   });
   return { stats: data, isPending };
 }

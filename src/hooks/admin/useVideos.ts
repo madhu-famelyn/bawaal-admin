@@ -6,6 +6,7 @@ import type { VideoPayload, VideoQuery, VideoStatus } from "@/types/admin";
 export const videosQueryOptions = (query: VideoQuery) => ({
   queryKey: ["admin", "videos", query] as const,
   queryFn: () => videosService.list(query),
+  refetchInterval: 3000,
 });
 
 /** Hook layer: screens read data from here, never from services directly. */

@@ -81,7 +81,8 @@ export interface DashboardStats {
   processingVideos: number;
   totalCreators: number;
   totalUsers: number;
-  watchHours: number;
+  totalViews: number;
+  watchHours?: number;
   pendingReports: number;
   viewsTrend: { day: string; views: number }[];
   verticalMix: { vertical: string; views: number }[];

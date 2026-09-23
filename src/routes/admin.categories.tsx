@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useCategories } from "@/hooks/admin/useCatalog";
 import { fullNumber } from "@/lib/format";
-import { languageNativeLabel } from "@/config/platform";
+import { languageLabel } from "@/config/platform";
 
 export const Route = createFileRoute("/admin/categories")({
   head: () => ({
@@ -55,7 +55,7 @@ function CategoriesPage() {
                     </p>
                     <p className="text-xs text-muted-foreground">
                       /{c.slug} ·{" "}
-                      {c.language === "all" ? "All languages" : languageNativeLabel(c.language)}
+                      {c.language === "all" ? "All languages" : languageLabel(c.language)}
                     </p>
                   </div>
                   {c.mature && <StatusPill tone="danger">18+</StatusPill>}
