@@ -40,6 +40,12 @@ export function useVideos() {
     onSuccess: invalidate,
   });
 
+  const updateSection = useMutation({
+    mutationFn: ({ id, sectionCategory }: { id: string; sectionCategory: string }) =>
+      videosService.updateSection(id, sectionCategory),
+    onSuccess: invalidate,
+  });
+
   const pageCount = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1;
 
   return {
@@ -52,8 +58,9 @@ export function useVideos() {
     setVideoFilter,
     goToPage: (page: number) => setVideoFilter({ page }),
     updateStatus: (id: string, status: VideoStatus) => updateStatus.mutate({ id, status }),
+    updateSection: (id: string, sectionCategory: string) => updateSection.mutate({ id, sectionCategory }),
     removeVideo: (id: string) => remove.mutate(id),
-    isMutating: updateStatus.isPending || remove.isPending,
+    isMutating: updateStatus.isPending || remove.isPending || updateSection.isPending,
   };
 }
 

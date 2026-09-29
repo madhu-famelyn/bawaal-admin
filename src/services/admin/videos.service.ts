@@ -22,6 +22,11 @@ export const videosService = {
     return data;
   },
 
+  updateSection: async (id: string, sectionCategory: string): Promise<Video> => {
+    const { data } = await http.patch<Video>(`/admin/videos/${id}`, { sectionCategory });
+    return data;
+  },
+
   remove: async (id: string): Promise<string> => {
     await http.delete(`/admin/videos/${id}`);
     return id;

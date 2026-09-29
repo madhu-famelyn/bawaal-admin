@@ -27,6 +27,15 @@ import { useCreators } from "@/hooks/admin/useCatalog";
 import { useCreateVideo } from "@/hooks/admin/useVideos";
 import type { VideoPayload } from "@/types/admin";
 
+const SECTION_CATEGORIES = [
+  { value: "trending",     label: "🔥 Trending Now" },
+  { value: "drama",        label: "❤️ Drama & Romance" },
+  { value: "18_plus",      label: "🔞 18+ Bold & Mature" },
+  { value: "coming_soon",  label: "⏳ Coming Soon" },
+  { value: "short_serial", label: "📺 Short Serials" },
+  { value: "thriller",     label: "⚡ Suspense & Thriller" },
+];
+
 const schema = z.object({
   title: z.string().min(2, "Give the video a title of at least 2 characters"),
   description: z.string().optional().default(""),
@@ -34,6 +43,7 @@ const schema = z.object({
   language: z.enum(["bho", "hi", "bh-mag", "raj"]).default("bho"),
   kind: z.enum(["short", "episode", "movie", "trailer"]).default("short"),
   status: z.enum(["draft", "processing", "published", "scheduled", "rejected"]).default("published"),
+  sectionCategory: z.string().default("trending"),
   creatorId: z.string().optional().default("admin"),
   durationSec: z.coerce.number().min(1).max(7200).default(60),
   mature: z.boolean().default(false),
@@ -76,6 +86,7 @@ function UploadPage() {
       language: "bho",
       kind: "short",
       status: "published",
+      sectionCategory: "trending",
       creatorId: "admin",
       durationSec: 60,
       mature: false,
@@ -230,6 +241,26 @@ function UploadPage() {
               {field("durationSec") && (
                 <p className="text-xs text-destructive">{field("durationSec")}</p>
               )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>Landing Page Section</Label>
+              <Select
+                value={watch("sectionCategory")}
+                onValueChange={(v) => setValue("sectionCategory", v, { shouldValidate: true })}
+              >
+                <SelectTrigger>
+                  <SelectValue>
+                    {SECTION_CATEGORIES.find((s) => s.value === watch("sectionCategory"))?.label ?? "🔥 Trending Now"}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {SECTION_CATEGORIES.map((s) => (
+                    <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">Which section row on the landing page this video appears in</p>
             </div>
 
             <div className="space-y-2">

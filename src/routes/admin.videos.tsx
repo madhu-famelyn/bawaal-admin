@@ -27,6 +27,15 @@ import type { VideoStatus } from "@/types/admin";
 
 const STATUSES: VideoStatus[] = ["draft", "processing", "scheduled", "published", "rejected"];
 
+const SECTION_CATEGORIES = [
+  { value: "trending",     label: "🔥 Trending" },
+  { value: "drama",        label: "❤️ Drama" },
+  { value: "18_plus",      label: "🔞 18+" },
+  { value: "coming_soon",  label: "⏳ Coming Soon" },
+  { value: "short_serial", label: "📺 Short Serials" },
+  { value: "thriller",     label: "⚡ Thriller" },
+];
+
 export const Route = createFileRoute("/admin/videos")({
   head: () => ({
     meta: [
@@ -57,6 +66,7 @@ function VideosPage() {
     setVideoFilter,
     goToPage,
     updateStatus,
+    updateSection,
     removeVideo,
   } = useVideos();
 
@@ -132,6 +142,7 @@ function VideosPage() {
                 <TableHead className="hidden lg:table-cell">Creator</TableHead>
                 <TableHead className="hidden sm:table-cell">Length</TableHead>
                 <TableHead className="hidden xl:table-cell">Views</TableHead>
+                <TableHead className="hidden lg:table-cell">Section</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -139,7 +150,7 @@ function VideosPage() {
             <TableBody>
               {isPending && (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
+                  <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
                     <Loader2 className="mr-2 inline size-4 animate-spin" /> Loading catalog…
                   </TableCell>
                 </TableRow>
@@ -147,7 +158,7 @@ function VideosPage() {
 
               {!isPending && videos.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
+                  <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
                     No videos match these filters.
                   </TableCell>
                 </TableRow>
@@ -176,6 +187,11 @@ function VideosPage() {
                     {compactNumber(v.views)}
                     <span className="ml-2 text-xs">{shortDate(v.publishedAt)}</span>
                   </TableCell>
+                  <TableCell className="hidden lg:table-cell">
+                    <span className="text-xs text-muted-foreground">
+                      {SECTION_CATEGORIES.find((s) => s.value === (v.sectionCategory ?? "trending"))?.label ?? "🔥 Trending"}
+                    </span>
+                  </TableCell>
                   <TableCell>
                     <StatusPill tone={statusTone(v.status)}>{v.status}</StatusPill>
                   </TableCell>
@@ -198,6 +214,24 @@ function VideosPage() {
                             <SelectItem key={s} value={s} className="capitalize">
                               {s}
                             </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select
+                        value={v.sectionCategory ?? "trending"}
+                        onValueChange={(s) => {
+                          updateSection(v.id, s);
+                          toast.success(`"${v.title}" → ${SECTION_CATEGORIES.find((c) => c.value === s)?.label}`);
+                        }}
+                      >
+                        <SelectTrigger className="h-8 w-36 text-xs">
+                          <SelectValue>
+                            {SECTION_CATEGORIES.find((s) => s.value === (v.sectionCategory ?? "trending"))?.label ?? "🔥 Trending"}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SECTION_CATEGORIES.map((s) => (
+                            <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>

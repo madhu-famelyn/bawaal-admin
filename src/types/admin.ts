@@ -24,6 +24,7 @@ export interface Video {
   language: LanguageCode;
   kind: VideoKind;
   status: VideoStatus;
+  sectionCategory: string;
   mature: boolean;
   durationSec: number;
   episodes?: number;
@@ -111,6 +112,7 @@ export interface VideoPayload {
   language: LanguageCode;
   kind: VideoKind;
   status: VideoStatus;
+  sectionCategory: string;
   mature: boolean;
   durationSec: number;
   creatorId: string;
